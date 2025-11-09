@@ -62,11 +62,11 @@ document.getElementById("analyze").addEventListener("click", () => {
          if (accNumIndex < 3) {
             html += `
    <td>${v.totalValue.toFixed(2)}</td>
-   <td></td>
+   <td>0</td>
    `;
          } else {
             html += `
-     <td></td>
+     <td>0</td>
    <td>${v.totalValue.toFixed(2)}</td>
    `;
          }
@@ -80,6 +80,7 @@ document.getElementById("analyze").addEventListener("click", () => {
    }
 
    html += "</tbody></table>";
+   const accountNumber = document.getElementById("accountSelect").value;
 
    html = `<table>
    <thead>
@@ -93,7 +94,7 @@ document.getElementById("analyze").addEventListener("click", () => {
    <tbody>
       <tr>
          <td>${data.SPAN.totalValue}</td>
-         <td></td>
+         <td>0</td>
 
          <td>1321</td>
          <td>مجموع سحوبات الفيزا SPAN</td>
@@ -101,7 +102,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${data.MASTER_CARD.totalValue}</td>
-         <td></td>
+         <td>0</td>
 
          <td>1321</td>
          <td>مجموع سحوبات الفيزا MASTER_CARD</td>
@@ -109,7 +110,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${data.VISA.totalValue}</td>
-         <td></td>
+         <td>0</td>
 
          <td>1321</td>
          <td>مجموع سحوبات الفيزا VISA</td>
@@ -117,7 +118,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${data.SPAN.totalFee}</td>
-         <td></td>
+         <td>0</td>
 
          <td>5211</td>
          <td>مصاريف فيزا SPAN</td>
@@ -125,7 +126,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${data.MASTER_CARD.totalFee}</td>
-         <td></td>
+         <td>0</td>
 
          <td>5211</td>
          <td>مصاريف فيزا MASTER_CARD</td>
@@ -133,7 +134,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${data.VISA.totalFee}</td>
-         <td></td>
+         <td>0</td>
 
          <td>5211</td>
          <td>مصاريف فيزا VISA</td>
@@ -141,7 +142,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${(data.SPAN.totalFee / VAT_DIV).toFixed(2)}</td>
-         <td></td>
+         <td>0</td>
 
          <td>126</td>
          <td>ضريبة مصاريف فيزا SPAN</td>
@@ -149,7 +150,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${(data.MASTER_CARD.totalFee / VAT_DIV).toFixed(2)}</td>
-         <td></td>
+         <td>0</td>
 
          <td>126</td>
          <td>ضريبة مصاريف فيزا MASTER_CARD</td>
@@ -157,69 +158,69 @@ document.getElementById("analyze").addEventListener("click", () => {
 
       <tr>
          <td>${(data.VISA.totalFee / VAT_DIV).toFixed(2)}</td>
-         <td></td>
+         <td>0</td>
 
          <td>126</td>
          <td>ضريبة مصاريف فيزا VISA</td>
       </tr>
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${data.SPAN.totalValue}</td>
-         <td>1331</td>
+         <td>${accountNumber}</td>
          <td>مجموع سحوبات الفيزا SPAN</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${data.MASTER_CARD.totalValue}</td>
-         <td>1331</td>
+         <td>${accountNumber}</td>
          <td>مجموع سحوبات الفيزا MASTER_CARD</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${data.VISA.totalValue}</td>
-         <td>1331</td>
+         <td>${accountNumber}</td>
          <td>مجموع سحوبات الفيزا VISA</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${data.SPAN.totalFee}</td>
          <td>1321</td>
          <td>مصاريف فيزا SPAN</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${data.MASTER_CARD.totalFee}</td>
          <td>1321</td>
          <td>مصاريف فيزا MASTER_CARD</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${data.VISA.totalFee}</td>
          <td>1321</td>
          <td>مصاريف فيزا VISA</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${(data.SPAN.totalFee / VAT_DIV).toFixed(2)}</td>
          <td>1321</td>
          <td>ضريبة مصاريف فيزا SPAN</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${(data.MASTER_CARD.totalFee / VAT_DIV).toFixed(2)}</td>
          <td>1321</td>
          <td>ضريبة مصاريف فيزا MASTER_CARD</td>
       </tr>
 
       <tr>
-         <td></td>
+         <td>0</td>
          <td>${(data.VISA.totalFee / VAT_DIV).toFixed(2)}</td>
          <td>1321</td>
          <td>ضريبة مصاريف فيزا VISA</td>

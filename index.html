@@ -38,6 +38,13 @@
             gap: 10px;
             margin-bottom: 20px;
          }
+         select {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+         }
          button {
             background: #004d7a;
             color: white;
@@ -80,77 +87,20 @@
             <textarea
                id="types"
                placeholder="قائمة نوع البطاقة (SPAN / VISA / MASTER_CARD)..."
-            >
-SPAN
-SPAN
-SPAN
-SPAN
-SPAN
-SPAN
-SPAN
-SPAN
-SPAN
-SPAN
-SPAN
-MASTER_CARD
-SPAN
-SPAN
-SPAN
-SPAN
-VISA
-MASTER_CARD
-SPAN
-MASTER_CARD
-</textarea
-            >
-            <textarea id="values" placeholder="قائمة قيم العمليات...">
-59.00
-225.00
-99.00
-129.00
-280.00
-195.00
-118.00
-225.00
-60.00
-160.00
-146.00
-332.00
-95.00
-129.00
-95.00
-205.00
-205.00
-254.00
-155.00
-195.00
-</textarea
-            >
-            <textarea id="fees" placeholder="قائمة رسوم العمليات...">
-0.41
-1.58
-0.69
-0.90
-1.96
-1.37
-0.83
-1.58
-0.42
-1.12
-1.02
-8.30
-0.67
-0.90
-0.67
-1.44
-5.13
-6.35
-1.09
-4.88
-</textarea
-            >
+            ></textarea>
+            <textarea
+               id="values"
+               placeholder="قائمة قيم العمليات..."
+            ></textarea>
+            <textarea id="fees" placeholder="قائمة رسوم العمليات..."></textarea>
          </div>
          <button id="analyze">تحليل البيانات</button>
+         <select id="accountSelect">
+            <option value="1331">1331 - جدة</option>
+            <option value="1332">1332 - تبوك</option>
+            <option value="1334">1334 - القصر مول</option>
+         </select>
+
          <div id="results"></div>
       </div>
 
