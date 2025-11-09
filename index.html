@@ -1,109 +1,43 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>تحليل عمليات البطاقات</title>
-      <style>
-         body {
-            font-family: "Tajawal", sans-serif;
-            background: #f4f6f8;
-            color: #222;
-            margin: 40px;
-         }
-         h2 {
-            text-align: center;
-            color: #004d7a;
-         }
-         .container {
-            max-width: 1000px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-         }
-         textarea {
-            width: 32%;
-            height: 250px;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            resize: vertical;
-            font-family: inherit;
-         }
-         .textareas {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 20px;
-         }
-         select {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-         }
-         button {
-            background: #004d7a;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-         }
-         button:hover {
-            background: #0073b1;
-         }
-         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-            font-size: 15px;
-         }
-         th,
-         td {
-            border: 1px solid #ddd;
-            padding: 8px 10px;
-            text-align: center;
-         }
-         th {
-            background: #e9f3f9;
-            color: #004d7a;
-         }
-         tfoot td {
-            background: #fafafa;
-            font-weight: bold;
-         }
-      </style>
-   </head>
-   <body>
-      <div class="container">
-         <h2>تحليل عمليات البطاقات</h2>
-         <div class="textareas">
-            <textarea
-               id="types"
-               placeholder="قائمة نوع البطاقة (SPAN / VISA / MASTER_CARD)..."
-            ></textarea>
-            <textarea
-               id="values"
-               placeholder="قائمة قيم العمليات..."
-            ></textarea>
-            <textarea id="fees" placeholder="قائمة رسوم العمليات..."></textarea>
-         </div>
-         <button id="analyze">تحليل البيانات</button>
-         <select id="accountSelect">
-            <option value="1331">1331 - جدة</option>
-            <option value="1332">1332 - تبوك</option>
-            <option value="1334">1334 - القصر مول</option>
-         </select>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تحليل عمليات البطاقات</title>
+  <style>
+    body { font-family: "Tajawal", sans-serif; background: #f4f6f8; color: #222; margin: 40px; }
+    h2 { text-align: center; color: #004d7a; }
+    .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
+    textarea { width: 32%; height: 250px; padding: 10px; border-radius: 8px; border:1px solid #ccc; resize: vertical; font-family: inherit;}
+    .textareas { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+    select { margin-bottom: 20px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
+    button { background: #004d7a; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.3s;}
+    button:hover { background: #0073b1; }
+    table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 15px; }
+    th, td { border:1px solid #ddd; padding:8px 10px; text-align:center;}
+    th { background: #e9f3f9; color: #004d7a; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>تحليل عمليات البطاقات</h2>
+  <div class="textareas">
+    <textarea id="types" placeholder="قائمة نوع البطاقة (SPAN / VISA / MASTER_CARD)..."></textarea>
+    <textarea id="values" placeholder="قائمة قيم العمليات..."></textarea>
+    <textarea id="fees" placeholder="قائمة رسوم العمليات..."></textarea>
+  </div>
 
-         <div id="results"></div>
-      </div>
+  <label for="accountSelect">اختر رقم الحساب:</label>
+  <select id="accountSelect">
+    <option value="1331">1331</option>
+    <option value="1332">1332</option>
+    <option value="1334">1334</option>
+  </select>
+  <br />
+  <button id="analyze">تحليل البيانات</button>
+  <div id="results"></div>
+</div>
 
-      <script src="script.js"></script>
-   </body>
+<script src="script.js"></script>
+</body>
 </html>
