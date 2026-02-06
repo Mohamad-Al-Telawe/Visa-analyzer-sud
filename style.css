@@ -1,0 +1,122 @@
+body {
+   font-family: "almarai", sans-serif;
+   background: #f4f6f8;
+   color: #222;
+   margin: 40px;
+}
+
+h2 {
+   text-align: center;
+   color: #2563eb;
+}
+
+.container {
+   max-width: 1000px;
+   margin: auto;
+   background: white;
+   padding: 25px;
+   border-radius: 15px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+   margin-bottom: 20px;
+   padding: 20px;
+   background: #f8faff;
+   border-radius: 10px;
+   border: 1px solid #d0e1ea;
+}
+
+input[type="file"] {
+   display: block;
+   width: 100%;
+   margin-bottom: 10px;
+}
+
+select {
+   padding: 10px;
+   border-radius: 8px;
+   border: 1px solid #ccc;
+   font-size: 16px;
+   width: 100%;
+   max-width: 300px;
+}
+
+button {
+   background: #2563eb;
+   color: white;
+   border: none;
+   padding: 12px 20px;
+   border-radius: 8px;
+   font-size: 16px;
+   cursor: pointer;
+   transition: background 0.3s;
+   width: 100%;
+   margin-top: 10px;
+}
+
+button:hover {
+   background: #0073b1;
+}
+
+.error {
+   color: red;
+   font-weight: bold;
+   margin-top: 10px;
+}
+
+/* --- تنسيقات النتائج الجديدة --- */
+
+/* الحاوية الرئيسية لليوم الواحد */
+.date-container {
+   margin-top: 40px;
+   border: 2px solid #2563eb;
+   border-radius: 10px;
+   overflow: hidden;
+   background: #fff;
+}
+
+.date-header {
+   background: #2563eb;
+   color: white;
+   padding: 15px;
+   font-size: 1.2em;
+   font-weight: bold;
+   text-align: center;
+}
+
+/* الحاوية الفرعية لكل نوع بطاقة */
+.card-type-container {
+   margin: 20px;
+   border: 1px solid #ddd;
+   border-radius: 8px;
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-type-header {
+   background: #e9f3f9;
+   color: #2563eb;
+   padding: 10px 15px;
+   font-weight: bold;
+   border-bottom: 1px solid #ddd;
+   border-radius: 8px 8px 0 0;
+}
+
+table {
+   width: 100%;
+   border-collapse: collapse;
+   font-size: 15px;
+}
+
+th,
+td {
+   border: 1px solid #ddd;
+   padding: 8px 10px;
+   text-align: center;
+}
+
+th {
+   background: #ececec;
+   color: #333;
+   font-weight: bold;
+}
