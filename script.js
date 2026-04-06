@@ -25,7 +25,6 @@ document.getElementById("analyze").addEventListener("click", () => {
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
 
-            // عدنا لاستخدام raw: false لقراءة النصوص كما هي
             const jsonData = XLSX.utils.sheet_to_json(worksheet, {
                 header: "A",
                 range: 16,
@@ -45,7 +44,7 @@ document.getElementById("analyze").addEventListener("click", () => {
                 return parseFloat(cleanStr) || 0;
             };
 
-            // دالة إصلاح شكل التاريخ
+            // دالة إصلاح شكل التاريخ (التعديل الأول: ضمان خروج التاريخ بصيغة dd/mm/yyyy)
             const formatDate = (dateStr) => {
                 if (!dateStr) return "";
                 const str = dateStr.toString().trim();
@@ -60,12 +59,13 @@ document.getElementById("analyze").addEventListener("click", () => {
                         if (year < 100) year += 2000;
 
                         let day, month;
-                        if (p2 > 12) {
-                            day = p2;
-                            month = p1;
-                        } else {
+                        // الإكسل عادة يصدر الشهر أولاً إلا إذا كان الرقم الأول أكبر من 12
+                        if (p1 > 12) {
                             day = p1;
                             month = p2;
+                        } else {
+                            month = p1; // الشهر هو الأول
+                            day = p2;   // اليوم هو الثاني
                         }
                         return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
                     }
@@ -77,41 +77,52 @@ document.getElementById("analyze").addEventListener("click", () => {
 
             jsonData.forEach((row) => {
                 const typeRaw = row["F"];
-                const dateRaw = row["L"]; 
-                const timeRaw = row["M"]; 
+                const transDateRaw = row["I"]; // 1. تاريخ العملية
+                const timeRaw = row["M"];      // 3. وقت الموازنة
+                const settlementRaw = row["R"];// 2. تاريخ التسوية
 
-                if (!typeRaw || !dateRaw) return;
+                if (!typeRaw || !transDateRaw) return;
 
                 const type = typeRaw.toString().trim().toUpperCase();
                 
-                let rawDateStr = dateRaw.toString().trim().split(" ")[0];
-                let dateStr = formatDate(rawDateStr); 
+                // تنظيف تاريخ العملية
+                let rawDateStr = transDateRaw.toString().trim().split(" ")[0];
+                let transDateStr = formatDate(rawDateStr); 
 
+                // تجهيز تاريخ التسوية (وإذا كان فارغ نضع له قيمة افتراضية حتى لا يتم تجاهله)
+                let settlementStr = settlementRaw ? settlementRaw.toString().trim() : "بدون تاريخ تسوية";
+
+                // تنظيف وقت الموازنة
                 let timeStr = timeRaw ? timeRaw.toString().trim().replace(/\.000$/, '') : "توقيت غير محدد";
 
                 const fee = parseAmount(row["O"]);
                 const value = parseAmount(row["P"]);
                 const vat = parseAmount(row["X"]);
 
-                if (!groupedData[dateStr]) {
-                    groupedData[dateStr] = {};
+                // بناء الهيكلية الجديدة ذات الـ 4 مستويات
+                if (!groupedData[transDateStr]) {
+                    groupedData[transDateStr] = {};
                 }
 
-                if (!groupedData[dateStr][timeStr]) {
-                    groupedData[dateStr][timeStr] = {};
+                if (!groupedData[transDateStr][settlementStr]) {
+                    groupedData[transDateStr][settlementStr] = {};
                 }
 
-                if (!groupedData[dateStr][timeStr][type]) {
-                    groupedData[dateStr][timeStr][type] = {
+                if (!groupedData[transDateStr][settlementStr][timeStr]) {
+                    groupedData[transDateStr][settlementStr][timeStr] = {};
+                }
+
+                if (!groupedData[transDateStr][settlementStr][timeStr][type]) {
+                    groupedData[transDateStr][settlementStr][timeStr][type] = {
                         totalValue: 0,
                         totalFee: 0,
                         totalVat: 0,
                     };
                 }
 
-                groupedData[dateStr][timeStr][type].totalValue += value;
-                groupedData[dateStr][timeStr][type].totalFee += fee;
-                groupedData[dateStr][timeStr][type].totalVat += vat;
+                groupedData[transDateStr][settlementStr][timeStr][type].totalValue += value;
+                groupedData[transDateStr][settlementStr][timeStr][type].totalFee += fee;
+                groupedData[transDateStr][settlementStr][timeStr][type].totalVat += vat;
             });
 
             // البيانات الثابتة
@@ -126,8 +137,8 @@ document.getElementById("analyze").addEventListener("click", () => {
                 { acc: "1321", note: "ضريبة مصاريف " },
             ];
 
-            // ترتيب التواريخ
-            const sortedDates = Object.keys(groupedData).sort((a, b) => {
+            // ترتيب تواريخ العملية
+            const sortedTransDates = Object.keys(groupedData).sort((a, b) => {
                 const partsA = a.split("/");
                 const partsB = b.split("/");
                 if (partsA.length === 3 && partsB.length === 3) {
@@ -139,75 +150,109 @@ document.getElementById("analyze").addEventListener("click", () => {
 
             let finalHtml = "";
 
-            sortedDates.forEach((dateKey) => {
-                const timesObj = groupedData[dateKey];
+            // الحلقة الأولى: تاريخ العملية
+            sortedTransDates.forEach((transDateKey) => {
+                const settlementObj = groupedData[transDateKey];
                 
-                const sortedTimes = Object.keys(timesObj).sort();
+                // ترتيب تواريخ التسوية (مثل 20260404 ثم 20260405)
+                const sortedSettlements = Object.keys(settlementObj).sort();
 
-                sortedTimes.forEach((timeKey) => {
-                    const cardData = timesObj[timeKey];
+                // الحلقة الثانية: تاريخ التسوية
+                sortedSettlements.forEach((settlementKey) => {
+                    const timesObj = settlementObj[settlementKey];
+                    
+                    // ترتيب الأوقات
+                    const sortedTimes = Object.keys(timesObj).sort();
 
-                    // --- التعديل الجديد يبدأ هنا ---
-                    // حساب تاريخ السند
-                    let sanadDate = dateKey;
-                    if (timeKey === "23:59:59") {
-                        const parts = dateKey.split('/');
-                        if (parts.length === 3) {
-                            let d = new Date(parts[2], parts[1] - 1, parts[0]);
-                            d.setDate(d.getDate() + 1); // إضافة يوم واحد
-                            sanadDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                    // الحلقة الثالثة: أوقات الموازنة
+                    sortedTimes.forEach((timeKey) => {
+                        const cardData = timesObj[timeKey];
+
+                        // --- التعديل الثاني يبدأ هنا: حساب تاريخ السند من تاريخ التسوية ---
+                        let sanadDate = "";
+                        
+                        // التحقق من أن تاريخ التسوية موجود وبصيغة YYYYMMDD (طوله 8 أرقام)
+                        if (settlementKey !== "بدون تاريخ تسوية" && settlementKey.toString().trim().length === 8) {
+                            const sStr = settlementKey.toString().trim();
+                            const y = parseInt(sStr.substring(0, 4));
+                            const m = parseInt(sStr.substring(4, 6)) - 1; // الأشهر تبدأ من صفر برمجياً
+                            const d = parseInt(sStr.substring(6, 8));
+                            
+                            let sDateObj = new Date(y, m, d);
+                            
+                            // إذا كانت الساعة 23:59:59 نضيف يوم
+                            if (timeKey === "23:59:59") {
+                                // sDateObj.setDate(sDateObj.getDate() + 1);
+                                // تم التعديل بسبب إلغاء زيادة اليوم
+                                sDateObj.setDate(sDateObj.getDate());
+                            }
+                            
+                            // تحويله لصيغة DD/MM/YYYY
+                            sanadDate = `${sDateObj.getDate().toString().padStart(2, '0')}/${(sDateObj.getMonth() + 1).toString().padStart(2, '0')}/${sDateObj.getFullYear()}`;
+                        } else {
+                            // في حال كان الحقل فارغاً، نعتمد على تاريخ العملية كاحتياط
+                            sanadDate = transDateKey;
+                            if (timeKey === "23:59:59") {
+                                const parts = transDateKey.split('/');
+                                if (parts.length === 3) {
+                                    let dObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                                    dObj.setDate(dObj.getDate() + 1);
+                                    sanadDate = `${dObj.getDate().toString().padStart(2, '0')}/${(dObj.getMonth() + 1).toString().padStart(2, '0')}/${dObj.getFullYear()}`;
+                                }
+                            }
                         }
-                    }
+                        // --- التعديل الثاني ينتهي هنا ---
 
-                    // حاوية التاريخ والوقت مع التعديل الجديد
-                    let dateBlockHtml = `<div class="date-container">
-                                            <div class="date-header" style="background-color: #2563eb; padding: 10px; border-bottom: 2px solid #ccc;">
-                                                تاريخ الموازنة: <strong>${dateKey}</strong> | وقت الموازنة: <strong>${timeKey}</strong><br>
-                                                تاريخ السند: <strong>${sanadDate}</strong>
-                                            </div>`;
-                    // --- التعديل الجديد ينتهي هنا ---
+                        // حاوية السند
+                        let dateBlockHtml = `<div class="date-container">
+                                                <div class="date-header" style="background-color: #2563eb; color: white; padding: 10px; border-bottom: 2px solid #ccc; border-radius: 5px;">
+                                                    تاريخ العملية: <strong>${transDateKey}</strong> | تاريخ التسوية: <strong>${settlementKey}</strong> | وقت الموازنة: <strong>${timeKey}</strong><br>
+                                                    تاريخ السند: <strong>${sanadDate}</strong>
+                                                </div>`;
 
-                    let hasContent = false;
+                        let hasContent = false;
 
-                    for (const [cardType, v] of Object.entries(cardData)) {
-                        const totalValue = v.totalValue;
-                        const totalFee = v.totalFee;
-                        const totalVat = v.totalVat;
+                        // الحلقة الرابعة: أنواع البطاقات لإنشاء الجداول
+                        for (const [cardType, v] of Object.entries(cardData)) {
+                            const totalValue = v.totalValue;
+                            const totalFee = v.totalFee;
+                            const totalVat = v.totalVat;
 
-                        let tableRows = "";
+                            let tableRows = "";
 
-                        // مدين
-                        if (totalValue > 0) tableRows += `<tr><td>${totalValue.toFixed(2)}</td><td>0</td><td>${debitAccounts[0].acc}</td><td>${debitAccounts[0].note} ${cardType}</td></tr>`;
-                        if (totalFee > 0)   tableRows += `<tr><td>${totalFee.toFixed(2)}</td><td>0</td><td>${debitAccounts[1].acc}</td><td>${debitAccounts[1].note} ${cardType}</td></tr>`;
-                        if (totalVat > 0)   tableRows += `<tr><td>${totalVat.toFixed(2)}</td><td>0</td><td>${debitAccounts[2].acc}</td><td>${debitAccounts[2].note} ${cardType}</td></tr>`;
+                            // مدين
+                            if (totalValue > 0) tableRows += `<tr><td>${totalValue.toFixed(2)}</td><td>0</td><td>${debitAccounts[0].acc}</td><td>${debitAccounts[0].note} ${cardType}</td></tr>`;
+                            if (totalFee > 0)   tableRows += `<tr><td>${totalFee.toFixed(2)}</td><td>0</td><td>${debitAccounts[1].acc}</td><td>${debitAccounts[1].note} ${cardType}</td></tr>`;
+                            if (totalVat > 0)   tableRows += `<tr><td>${totalVat.toFixed(2)}</td><td>0</td><td>${debitAccounts[2].acc}</td><td>${debitAccounts[2].note} ${cardType}</td></tr>`;
 
-                        // دائن
-                        if (totalValue > 0) tableRows += `<tr><td>0</td><td>${totalValue.toFixed(2)}</td><td>${creditAccounts[0].acc}</td><td>${creditAccounts[0].note} ${cardType}</td></tr>`;
-                        if (totalFee > 0)   tableRows += `<tr><td>0</td><td>${totalFee.toFixed(2)}</td><td>${creditAccounts[1].acc}</td><td>${creditAccounts[1].note} ${cardType}</td></tr>`;
-                        if (totalVat > 0)   tableRows += `<tr><td>0</td><td>${totalVat.toFixed(2)}</td><td>${creditAccounts[2].acc}</td><td>${creditAccounts[2].note} ${cardType}</td></tr>`;
+                            // دائن
+                            if (totalValue > 0) tableRows += `<tr><td>0</td><td>${totalValue.toFixed(2)}</td><td>${creditAccounts[0].acc}</td><td>${creditAccounts[0].note} ${cardType}</td></tr>`;
+                            if (totalFee > 0)   tableRows += `<tr><td>0</td><td>${totalFee.toFixed(2)}</td><td>${creditAccounts[1].acc}</td><td>${creditAccounts[1].note} ${cardType}</td></tr>`;
+                            if (totalVat > 0)   tableRows += `<tr><td>0</td><td>${totalVat.toFixed(2)}</td><td>${creditAccounts[2].acc}</td><td>${creditAccounts[2].note} ${cardType}</td></tr>`;
 
-                        if (tableRows) {
-                            hasContent = true;
-                            dateBlockHtml += `
-                                <div class="card-type-container" style="margin: 10px;">
-                                    <div class="card-type-header" style="color: #333; margin-bottom: 5px;">نوع البطاقة: ${cardType}</div>
-                                    <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
-                                        <thead>
-                                            <tr><th>مدين</th><th>دائن</th><th>اسم الحساب</th><th>ملاحظة</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            ${tableRows}
-                                        </tbody>
-                                    </table>
-                                </div>`;
+                            if (tableRows) {
+                                hasContent = true;
+                                dateBlockHtml += `
+                                    <div class="card-type-container" style="margin: 10px;">
+                                        <div class="card-type-header" style="color: #333; margin-bottom: 5px; font-weight: bold;">نوع البطاقة: ${cardType}</div>
+                                        <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
+                                            <thead style="background-color: #f8f9fa;">
+                                                <tr><th>مدين</th><th>دائن</th><th>اسم الحساب</th><th>ملاحظة</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                ${tableRows}
+                                            </tbody>
+                                        </table>
+                                    </div>`;
+                            }
                         }
-                    }
 
-                    dateBlockHtml += `</div>`;
+                        dateBlockHtml += `</div><br>`;
 
-                    if (hasContent) {
-                        finalHtml += dateBlockHtml;
-                    }
+                        if (hasContent) {
+                            finalHtml += dateBlockHtml;
+                        }
+                    });
                 });
             });
 
