@@ -97,7 +97,7 @@ document.getElementById("analyze").addEventListener("click", () => {
 
                 const fee = parseAmount(row["O"]);
                 const value = parseAmount(row["P"]);
-                const vat = parseAmount(row["X"]);
+                const vat = parseAmount(row["Y"]);
 
                 // بناء الهيكلية الجديدة ذات الـ 4 مستويات
                 if (!groupedData[transDateStr]) {
