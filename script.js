@@ -129,7 +129,7 @@ document.getElementById("analyze").addEventListener("click", () => {
             const debitAccounts =[
                 { acc: "1321", note: "مجموع سحوبات " },
                 { acc: "5211", note: "مصاريف " },
-                { acc: "126", note: "ضريبة مصاريف " },
+                { acc: "5211", note: "ضريبة مصاريف " },
             ];
             const creditAccounts =[
                 { acc: accountNumber, note: "مجموع سحوبات " },
